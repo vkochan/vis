@@ -61,6 +61,7 @@ compatible environment as well as:
  * [LPeg](http://www.inf.puc-rio.br/~roberto/lpeg/) >= 0.12
    (optional runtime dependency required for syntax highlighting)
  * [TRE](http://laurikari.net/tre/) (optional for more memory efficient regex search)
+ * [sregex](https://github.com/openresty/sregex/) >= v0.0.1rc1 (optional)
 
 Assuming these dependencies are met, execute:
 
