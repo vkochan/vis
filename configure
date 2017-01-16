@@ -26,6 +26,7 @@ Optional features:
   --enable-lua            build with Lua support [auto]
   --enable-lpeg           build with support for statically linking to LPeg [auto]
   --enable-tre            build with TRE regex support [auto]
+  --enable-sregex         build with sregex regular expression library [auto]
   --enable-selinux        build with SELinux support [auto]
   --enable-acl            build with POSIX ACL support [auto]
 
@@ -117,6 +118,7 @@ MANDIR='$(PREFIX)/share/man'
 lua=auto
 lpeg=auto
 tre=auto
+sregex=auto
 selinux=auto
 acl=auto
 
@@ -137,6 +139,8 @@ case "$arg" in
 --disable-lpeg|--enable-lpeg=no) lpeg=no ;;
 --enable-tre|--enable-tre=yes) tre=yes ;;
 --disable-tre|--enable-tre=no) tre=no ;;
+--enable-sregex|--enable-sregex=yes) sregex=yes ;;
+--disable-sregex|--enable-sregex=no) sregex=no ;;
 --enable-selinux|--enable-selinux=yes) selinux=yes ;;
 --disable-selinux|--enable-selinux=no) selinux=no ;;
 --enable-acl|--enable-acl=yes) acl=yes ;;
@@ -357,8 +361,9 @@ else
 	fail "$0: cannot find libtermkey"
 fi
 
-CONFIG_TRE=0
 REGEX_SRC=text-regex.c
+CONFIG_TRE=0
+CONFIG_SREGEX=0
 
 if test "$tre" != "no" ; then
 
@@ -401,8 +406,12 @@ EOF
 	fi
 fi
 
+if test "$sregex" != "no" -a $CONFIG_TRE -ne 1; then
+
+	printf "checking for sregex... "
+
 cat > "$tmpc" <<EOF
-#include <sregex.h>
+#include <sregex/sregex.h>
 
 int main(int argc, char *argv[]) {
     sre_pool_t *p = sre_create_pool(1024);
@@ -411,21 +420,27 @@ int main(int argc, char *argv[]) {
 }
 EOF
 
-CONFIG_SREGEX=0
-REGEX_SRC=text-regex.c
+	if test "$have_pkgconfig" = "yes" ; then
+		CFLAGS_SREGEX=$(pkg-config --cflags sregex 2>/dev/null)
+		LDFLAGS_SREGEX=$(pkg-config --libs sregex 2>/dev/null)
+	fi
 
-printf "checking for sregex... "
+	if test -z "$LDFLAGS_SREGEX"; then
+		CFLAGS_SREGEX=""
+		LDFLAGS_SREGEX="-lsregex"
+	fi
 
-CFLAGS_SREGEX="-I${PREFIX}/include/sregex"
-LDFLAGS_SREGEX="-L${PREFIX}/lib -lsregex"
-
-if $CC $CFLAGS $CFLAGS_SREGEX "$tmpc" \
-        $LDFLAGS $LDFLAGS_SREGEX -o "$tmpo" >/dev/null 2>&1 ; then
-        CONFIG_SREGEX=1
-        REGEX_SRC=text-sregex.c
-        printf "yes\n"
-else
-        printf "no\n"
+	if $CC $CFLAGS $CFLAGS_SREGEX "$tmpc" \
+	        $LDFLAGS $LDFLAGS_SREGEX -o "$tmpo" >/dev/null 2>&1 ; then
+	        CONFIG_SREGEX=1
+	        REGEX_SRC=text-regex-sregex.c
+	        printf "yes\n"
+	else
+	        printf "no\n"
+		CFLAGS_SREGEX=""
+		LDFLAGS_SREGEX=""
+		test "$sregex" = "yes" && fail "$0: cannot find libsregex"
+	fi
 fi
 
 CONFIG_LUA=0
@@ -618,7 +633,6 @@ CFLAGS_TRE = $CFLAGS_TRE
 LDFLAGS_TRE = $LDFLAGS_TRE
 CONFIG_SREGEX = $CONFIG_SREGEX
 CFLAGS_SREGEX = $CFLAGS_SREGEX
-REGEX_SRC = $REGEX_SRC
 LDFLAGS_SREGEX = $LDFLAGS_SREGEX
 CONFIG_LUA = $CONFIG_LUA
 CFLAGS_LUA = $CFLAGS_LUA

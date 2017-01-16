@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include <sregex.h>
+#include <sregex/sregex.h>
 
 #include "text-regex.h"
 #include "text-motions.h"
@@ -32,6 +32,12 @@ static void destroy_context(sre_vm_pike_ctx_t *ctx, Regex *r) {
 
 Regex *text_regex_new(void) {
 	return calloc(1, sizeof(Regex));
+}
+
+size_t text_regex_nsub(Regex *r) {
+	if (!r)
+		return 0;
+	return r->ncaptures;
 }
 
 int text_regex_compile(Regex *r, const char *string, int cflags) {
