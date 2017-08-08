@@ -6,7 +6,9 @@
 /vis-single
 /vis-single-payload.inc
 /vis-digraph
+/vis-version.h
 *.css
+*.d
 *.gcda
 *.gcno
 *.gcov

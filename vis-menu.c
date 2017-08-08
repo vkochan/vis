@@ -42,6 +42,8 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include "vis-version.h"
+
 #define CONTROL(ch)   (ch ^ 0x40)
 #define MIN(a,b)      ((a) < (b) ? (a) : (b))
 #define MAX(a,b)      ((a) > (b) ? (a) : (b))
@@ -573,7 +575,7 @@ int
 main(int argc, char **argv) {
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-v")) {
-			puts("vis-menu " VERSION);
+			puts("vis-menu " VIS_VERSION);
 			exit(EXIT_SUCCESS);
 		} else if (!strcmp(argv[i], "-i")) {
 			fstrncmp = strncasecmp;

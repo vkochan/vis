@@ -26,6 +26,9 @@ SRC = \
 	vis-text-objects.c \
 	$(REGEX_SRC)
 
+OBJ = $(SRC:.c=.o)
+DEP = $(SRC:.c=.d)
+
 ELF = \
 	vis \
 	vis-digraph \
@@ -52,7 +55,6 @@ CONFIG_SELINUX ?= 0
 CONFIG_TRE ?= 0
 
 CFLAGS_STD ?= -std=c99 -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700 -DNDEBUG
-CFLAGS_STD += -DVERSION=\"${VERSION}\"
 LDFLAGS_STD ?= -lc
 
 CFLAGS_LIBC ?= -DHAVE_MEMRCHR=0
@@ -99,10 +101,21 @@ config.h:
 config.mk:
 	@touch $@
 
-vis: config.h config.mk *.c *.h
-	${CC} ${CFLAGS} ${CFLAGS_VIS} ${CFLAGS_EXTRA} ${SRC} ${LDFLAGS} ${LDFLAGS_VIS} -o $@
+vis-version.h.tmp:
+vis-version.h: vis-version.h.tmp
+	@printf "#ifndef VIS_VERSION\n#define VIS_VERSION \"%s\"\n#endif\n" "$(VERSION)" > $@.tmp
+	@cmp -s $@.tmp $@ || cp $@.tmp $@
+	@rm -f $@.tmp
 
-vis-menu: vis-menu.c
+-include $(DEP)
+
+.c.o:
+	${CC} ${CFLAGS} ${CFLAGS_DEPS} ${CFLAGS_VIS} ${CFLAGS_EXTRA} -c -o $@ $<
+
+vis: config.h config.mk vis-version.h ${OBJ}
+	${CC} ${OBJ} ${LDFLAGS} ${LDFLAGS_VIS} ${LDFLAGS_EXTRA} -o $@
+
+vis-menu: vis-menu.c vis-version.h
 	${CC} ${CFLAGS} ${CFLAGS_AUTO} ${CFLAGS_STD} ${CFLAGS_EXTRA} $< ${LDFLAGS} ${LDFLAGS_STD} ${LDFLAGS_AUTO} -o $@
 
 vis-digraph: vis-digraph.c
@@ -142,7 +155,7 @@ profile: clean
 	@$(MAKE) CFLAGS_AUTO='' LDFLAGS_AUTO='' CFLAGS_EXTRA='-pg -O2'
 
 coverage: clean
-	@$(MAKE) CFLAGS_EXTRA='--coverage'
+	@$(MAKE) CFLAGS_EXTRA='--coverage' LDFLAGS_EXTRA='--coverage'
 
 test-update:
 	git submodule init
@@ -154,7 +167,7 @@ test:
 
 clean:
 	@echo cleaning
-	@rm -f $(ELF) vis-single vis-single-payload.inc vis-*.tar.gz *.gcov *.gcda *.gcno
+	@rm -f $(ELF) vis-single vis-single-payload.inc vis-*.tar.gz *.gcov *.gcda *.gcno *.o *.d
 
 dist: clean
 	@echo creating dist tarball
@@ -221,4 +234,4 @@ uninstall:
 	@echo removing support files from ${DESTDIR}${SHAREPREFIX}/vis
 	@rm -rf ${DESTDIR}${SHAREPREFIX}/vis
 
-.PHONY: all clean dist install uninstall debug profile coverage test test-update luadoc luadoc-all luacheck man docker
+.PHONY: all clean dist install uninstall debug profile coverage test test-update luadoc luadoc-all luacheck man docker vis-version.h.tmp

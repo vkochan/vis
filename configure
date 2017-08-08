@@ -108,6 +108,7 @@ fi
 
 CFLAGS_AUTO=
 CFLAGS_TRY=
+CFLAGS_DEPS=
 LDFLAGS_AUTO=
 LDFLAGS_TRY=
 SRCDIR=
@@ -245,6 +246,13 @@ tryflag CFLAGS_AUTO -fstack-protector-all
 tryldflag LDFLAGS -Wl,-z,now
 tryldflag LDFLAGS -Wl,-z,relro
 tryldflag LDFLAGS_AUTO -pie
+
+# Try Makefile dependency generation flags
+if ! tryflag CFLAGS_DEPS "-MMD -MP"; then
+  if ! tryflag CFLAGS_DEPS "-MD -MP"; then
+    tryflag CFLAGS_DEPS -MD
+  fi
+fi
 
 printf "creating config.mk... "
 
@@ -638,6 +646,7 @@ CONFIG_SELINUX = $CONFIG_SELINUX
 CFLAGS_SELINUX = $CFLAGS_SELINUX
 LDFLAGS_SELINUX = $LDFLAGS_SELINUX
 CFLAGS_LIBC = -DHAVE_MEMRCHR=$HAVE_MEMRCHR
+CFLAGS_DEPS = $CFLAGS_DEPS
 EOF
 exec 1>&3 3>&-
 

@@ -9,6 +9,7 @@ typedef struct Vis Vis;
 typedef struct File File;
 typedef struct Win Win;
 
+#include "vis-version.h"
 #include "ui.h"
 #include "view.h"
 #include "text-regex.h"

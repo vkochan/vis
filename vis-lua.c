@@ -2735,7 +2735,7 @@ void vis_lua_init(Vis *vis) {
 	lua_getglobal(L, "vis");
 	lua_getmetatable(L, -1);
 
-	lua_pushstring(L, VERSION);
+	lua_pushstring(L, VIS_VERSION);
 	lua_setfield(L, -2, "VERSION");
 
 	lua_newtable(L);
