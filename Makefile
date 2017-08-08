@@ -2,13 +2,40 @@
 
 REGEX_SRC ?= text-regex.c
 
-SRC = array.c buffer.c libutf.c main.c map.c \
-	sam.c text.c text-motions.c text-objects.c text-util.c \
-	ui-terminal.c view.c vis.c vis-lua.c vis-modes.c vis-motions.c \
-	vis-operators.c vis-registers.c vis-marks.c vis-prompt.c vis-text-objects.c $(REGEX_SRC)
+SRC = \
+	array.c \
+	buffer.c \
+	libutf.c \
+	main.c \
+	map.c \
+	sam.c \
+	text.c \
+	text-motions.c \
+	text-objects.c \
+	text-util.c \
+	ui-terminal.c \
+	view.c \
+	vis.c \
+	vis-lua.c \
+	vis-marks.c \
+	vis-modes.c \
+	vis-motions.c \
+	vis-operators.c \
+	vis-prompt.c \
+	vis-registers.c \
+	vis-text-objects.c \
+	$(REGEX_SRC)
 
-ELF = vis vis-menu vis-digraph
-EXECUTABLES = $(ELF) vis-clipboard vis-complete vis-open
+ELF = \
+	vis \
+	vis-digraph \
+	vis-menu
+
+EXECUTABLES = \
+	vis-clipboard \
+	vis-complete \
+	vis-open \
+	$(ELF)
 
 MANUALS = $(EXECUTABLES:=.1)
 
@@ -16,13 +43,13 @@ DOCUMENTATION = LICENSE README.md
 
 VERSION = $(shell git describe --always --dirty 2>/dev/null || echo "v0.4-git")
 
-CONFIG_HELP ?= 1
-CONFIG_CURSES ?= 1
-CONFIG_LUA ?= 1
-CONFIG_LPEG ?= 0
-CONFIG_TRE ?= 0
 CONFIG_ACL ?= 0
+CONFIG_CURSES ?= 1
+CONFIG_HELP ?= 1
+CONFIG_LPEG ?= 0
+CONFIG_LUA ?= 1
 CONFIG_SELINUX ?= 0
+CONFIG_TRE ?= 0
 
 CFLAGS_STD ?= -std=c99 -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700 -DNDEBUG
 CFLAGS_STD += -DVERSION=\"${VERSION}\"
@@ -30,9 +57,17 @@ LDFLAGS_STD ?= -lc
 
 CFLAGS_LIBC ?= -DHAVE_MEMRCHR=0
 
-CFLAGS_VIS = $(CFLAGS_AUTO) $(CFLAGS_TERMKEY) $(CFLAGS_CURSES) $(CFLAGS_ACL) \
-	$(CFLAGS_SELINUX) $(CFLAGS_TRE) $(CFLAGS_LUA) $(CFLAGS_LPEG) $(CFLAGS_STD) \
-	$(CFLAGS_LIBC)
+CFLAGS_VIS = \
+	$(CFLAGS_ACL) \
+	$(CFLAGS_AUTO) \
+	$(CFLAGS_CURSES) \
+	$(CFLAGS_LIBC) \
+	$(CFLAGS_LPEG) \
+	$(CFLAGS_LUA) \
+	$(CFLAGS_SELINUX) \
+	$(CFLAGS_STD) \
+	$(CFLAGS_TERMKEY) \
+	$(CFLAGS_TRE)
 
 CFLAGS_VIS += -DVIS_PATH=\"${SHAREPREFIX}/vis\"
 CFLAGS_VIS += -DCONFIG_HELP=${CONFIG_HELP}
@@ -43,10 +78,18 @@ CFLAGS_VIS += -DCONFIG_TRE=${CONFIG_TRE}
 CFLAGS_VIS += -DCONFIG_SELINUX=${CONFIG_SELINUX}
 CFLAGS_VIS += -DCONFIG_ACL=${CONFIG_ACL}
 
-LDFLAGS_VIS = $(LDFLAGS_AUTO) $(LDFLAGS_TERMKEY) $(LDFLAGS_CURSES) $(LDFLAGS_ACL) \
-	$(LDFLAGS_SELINUX) $(LDFLAGS_TRE) $(LDFLAGS_LUA) $(LDFLAGS_LPEG) $(LDFLAGS_STD)
+LDFLAGS_VIS = \
+	$(LDFLAGS_ACL) \
+	$(LDFLAGS_AUTO) \
+	$(LDFLAGS_CURSES) \
+	$(LDFLAGS_LPEG) \
+	$(LDFLAGS_LUA) \
+	$(LDFLAGS_SELINUX) \
+	$(LDFLAGS_STD) \
+	$(LDFLAGS_TERMKEY) \
+	$(LDFLAGS_TRE)
 
-STRIP?=strip
+STRIP ?= strip
 
 all: $(ELF)
 
