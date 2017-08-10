@@ -73,7 +73,7 @@ script:
       make local && make clean;
     fi
   - ./configure CFLAGS="-I$(pwd)/dependency/install/usr/include" LDFLAGS="-L$(pwd)/dependency/install/usr/lib" $CONFIG
-  - make CFLAGS_EXTRA=--coverage $TARGET
+  - make CFLAGS_EXTRA=--coverage LDFLAGS_EXTRA=--coverage $TARGET
   - if [ -e vis ]; then
       LD_LIBRARY_PATH="$(pwd)/dependency/install/usr/lib" ./vis -v;
       file vis;
