@@ -242,7 +242,12 @@ tryldflag LDFLAGS_AUTO -Wl,--gc-sections
 
 # Try hardening flags
 tryflag CFLAGS -fPIE
-tryflag CFLAGS_AUTO -fstack-protector-all
+if tryflag CFLAGS_AUTO -fstack-protector-all; then
+       case "$OS" in
+       CYGWIN*)    LDFLAGS_AUTO="$LDFLAGS_AUTO -fstack-protector-all" ;;
+       esac
+fi
+
 tryldflag LDFLAGS -Wl,-z,now
 tryldflag LDFLAGS -Wl,-z,relro
 tryldflag LDFLAGS_AUTO -pie
