@@ -10,6 +10,9 @@ install: make local
 script: true
 
 addons:
+  apt:
+    packages:
+    - libtool-bin
   coverity_scan:
     project:
       name: "martanne/vis"
